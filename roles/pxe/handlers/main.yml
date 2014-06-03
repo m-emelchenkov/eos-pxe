@@ -1,0 +1,9 @@
+---
+- name: Restart DHCPD
+  service: name=isc-dhcp-server state=restarted
+
+- name: Restart NFSD
+  service: name=nfs-kernel-server state=restarted
+
+- name: Restart TFTPD
+  service: name=tftpd-hpa state=restarted

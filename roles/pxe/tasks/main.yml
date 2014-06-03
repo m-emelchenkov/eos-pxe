@@ -1,0 +1,60 @@
+---
+- name: Copy DHCPD config
+  template: src=dhcpd.conf dest=/etc/dhcp/dhcpd.conf
+  notify:
+    - Restart DHCPD
+
+- name: Copy NFS config
+  template: src=exports dest=/etc/
+  notify:
+    - Restart NFSD
+
+- name: Clean PXE directory
+  shell: "rm -rf /home/vagrant/pxe/*"
+
+- name: Copy PXE bootloader
+  synchronize: src=roles/pxe/files/ dest={{ pxe_dir }}
+
+- name: Mount distribution ISO
+  mount: name=/mnt src=/vagrant/{{ iso_file }} fstype=iso9660 state=mounted
+
+- name: Copy original menu files
+  command: "cp -R /mnt/isolinux {{ pxe_dir }}/pxelinux"
+
+- name: Fix menu file paths
+  replace: dest="{{ pxe_dir }}/pxelinux/{{ item }}" regexp='^include (.*)' replace="include pxelinux/\1"
+  with_items:
+    - adtxt.cfg
+    - exithelp.cfg
+    - gfxboot.cfg
+    - isolinux.cfg
+    - menu.cfg
+    - prompt.cfg
+    - stdmenu.cfg
+    - txt.cfg
+
+- name: Add NFS boot option
+  replace: dest="{{ pxe_dir }}/pxelinux/{{ item }}" regexp='(append .*)' replace="\1 netboot=nfs nfsroot={{ server_ip }}:/mnt"
+  with_items:
+    - adtxt.cfg
+    - exithelp.cfg
+    - gfxboot.cfg
+    - isolinux.cfg
+    - menu.cfg
+    - prompt.cfg
+    - stdmenu.cfg
+    - txt.cfg
+
+# TODO: Find a way to list remote files
+#- name: Fix menu file paths | 1
+#  shell: ls -1 /mnt/isolinux/*.cfg
+#  register: ls
+#
+#- name: Fix menu file paths | 2
+#  replace: dest="{{ pxe_dir }}/pxelinux/{{ item }}" regexp="^include( ).*" replace="pxelinux/"
+#  with_items: ls.stdout
+
+- name: Assembly TFTPD directory
+  mount: name=/var/lib/tftpboot fstype=aufs src=none opts=ro,dirs=/mnt:{{ pxe_dir }} state=mounted
+  notify:
+    - Restart TFTPD

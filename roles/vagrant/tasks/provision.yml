@@ -1,0 +1,18 @@
+---
+- name: Update APT cache
+  apt: update_cache=yes
+
+- name: Ensure server software is installed
+  apt: name={{ item }} state=present
+  with_items:
+    - tftpd-hpa
+    - isc-dhcp-server
+    - nfs-kernel-server
+    - aufs-tools
+
+- name: Ensure sever software loaded at startup
+  service: name={{ item }} enabled=yes state=started
+  with_items:
+    - isc-dhcp-server
+    - nfs-kernel-server
+    - tftpd-hpa

@@ -1,0 +1,6 @@
+---
+- include: init.yml
+  when: action == "init"
+
+- include: provision.yml
+  when: action == "provision"

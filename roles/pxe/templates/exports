@@ -1,0 +1,1 @@
+/mnt {{ server_ip }}/24 (ro,no_root_squash,no_subtree_check,async)

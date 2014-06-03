@@ -1,0 +1,14 @@
+---
+# Localhost
+- hosts: local
+  roles:
+    - common
+    - { role: vagrant, when: action == 'init' }
+
+# Vagrant VM
+- hosts: default
+  sudo: yes
+  roles:
+    - common
+    - { role: vagrant, when: action == 'provision' }
+    - { role: pxe, when: action == 'start' }
