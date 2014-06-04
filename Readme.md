@@ -4,7 +4,7 @@ How to start:
 
 1. Ensure you have Ansible, Vagrant and Virtual Box installed on your host OS.
 2. Download `elementaryos-stable-i386.20130810.iso` (elementaryOS 0.2 Luna) to `files` directory.
-3. Edit config in `roles/common/default/main.yml`.
+3. Edit config in `roles/common/vars/main.yml`.
 4. Run `start.sh`.
 5. Connect host and target machines with Ethernet patch cord.
 6. On a target machine alter BIOS boot order to have PXE boot before HDD boot.
